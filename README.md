@@ -1,7 +1,7 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Ansible role to set up a small glusterfs cluster
 
 Requirements
 ------------
