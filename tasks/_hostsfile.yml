@@ -1,0 +1,11 @@
+---
+  - name: hostfile | add servers to hostfile
+    lineinfile:
+      line: "{{ item.ip }}  {{ item.hostname }}"
+      state: present
+      path: /etc/hosts
+    become: true
+    with_items:
+      - "{{ servers }}"
+    tags:
+      - tags

@@ -1,0 +1,29 @@
+---
+  - name: gluster-install | add GPG key
+    apt_key:
+      url: https://download.gluster.org/pub/gluster/glusterfs/3.10/rsa.pub
+      state: present
+    become: true
+    tags:
+      - tags
+
+  - name: gluster-install | add gluster repository
+    apt_repository:
+      repo: ppa:gluster/glusterfs-3.10
+      state: present
+    become: true
+    tags:
+      - tags
+
+
+  - name: gluster-install | install prereq and gluster
+    apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    become: true
+    with_items:
+      - software-properties-common
+      - glusterfs-server
+    tags:
+      - tags

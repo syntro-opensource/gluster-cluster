@@ -1,0 +1,11 @@
+---
+# tasks file for gluster-cluster
+- name: Set fact glusterfs nodes list
+  set_fact:
+    glusterfs_nodes: "{{ ansible_play_hosts }}"
+  run_once: true
+  when: glusterfs_nodes is undefined
+
+- import_tasks: _hostsfile.yml
+- import_tasks: _gluster-install.yml
+- import_tasks: _gluster-cluster.yml

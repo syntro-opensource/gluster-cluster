@@ -1,0 +1,6 @@
+---
+# defaults file for gluster-cluster
+
+servers:
+  - { ip: 192.168.200.21, hostname: gluster1.storage.local }
+  - { ip: 192.168.200.22, hostname: gluster2.storage.local }
