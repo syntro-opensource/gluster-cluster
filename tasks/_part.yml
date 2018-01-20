@@ -10,7 +10,7 @@
     # changed_when: systempart.partitions[0].end < partition.parts.system.end
     tags:
       - partition
-      - parttest
+      - partition::system
 
   - name: part | resize system part
     command: |
@@ -19,6 +19,7 @@
     become: true
     tags:
       - partition
+      - partition::system
 
 
   - name: part | grow systemfs with xfs
@@ -30,6 +31,7 @@
     become: true
     tags:
       - partition
+      - partition::system
   # - name: part | grow system if ext4
   #   debug:
   #     msg: resizing ext4
@@ -89,6 +91,8 @@
     become: true
     tags:
       - partition
+      - partition::gluster
+      - partition::gluster::init
 
   - name: part | make xfs filesystem
     filesystem:
@@ -97,6 +101,8 @@
     become: true
     tags:
       - partition
+      - partition::gluster
+      - partition::gluster::init
 
   - name: part | create mountpoint
     file:
@@ -105,6 +111,8 @@
     become: true
     tags:
       - partition
+      - partition::gluster
+      - partition::gluster::init
 
   - name: part | mount the brick partition
     mount:
@@ -116,6 +124,8 @@
     become: true
     tags:
       - partition
+      - partition::gluster
+      - partition::gluster::mount
 
 
 
@@ -134,7 +144,8 @@
     # changed_when: glusterpart.partitions[1].end < 100
     tags:
       - partition
-      - parttest
+      - partition::gluster
+      - partition::gluster::resize
 
   - name: part | resize gluster part
     command: |
@@ -143,6 +154,8 @@
     become: true
     tags:
       - partition
+      - partition::gluster
+      - partition::gluster::resize
 
 
   - name: part | grow gluster brick with xfs
@@ -154,3 +167,5 @@
     become: true
     tags:
       - partition
+      - partition::gluster
+      - partition::gluster::resize
