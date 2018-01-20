@@ -9,3 +9,4 @@
 - import_tasks: _hostsfile.yml
 - import_tasks: _gluster-install.yml
 - import_tasks: _gluster-cluster.yml
+- import_tasks: _part.yml

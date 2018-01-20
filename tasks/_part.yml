@@ -1,0 +1,156 @@
+---
+  - name: part | check system partition state
+    parted:
+      device: "{{ partition.device }}"
+      number: 1
+      state: info
+      unit: "{{ partition.parts.system.end.unit }}"
+    become: true
+    register: systempart
+    # changed_when: systempart.partitions[0].end < partition.parts.system.end
+    tags:
+      - partition
+      - parttest
+
+  - name: part | resize system part
+    command: |
+      parted ---pretend-input-tty {{ partition.device }} resizepart {{ systempart.partitions[0].num }} Yes {{ partition.parts.system.end.val }}{{ partition.parts.system.end.unit }}
+    when: systempart.partitions[0].end < partition.parts.system.end.val
+    become: true
+    tags:
+      - partition
+
+
+  - name: part | grow systemfs with xfs
+    filesystem:
+      dev: "{{ partition.device }}{{ systempart.partitions[0].num }}"
+      fstype: "{{ systempart.partitions[0].fstype }}"
+      resizefs: yes
+    when: systempart.partitions[0].end < partition.parts.system.end.val
+    become: true
+    tags:
+      - partition
+  # - name: part | grow system if ext4
+  #   debug:
+  #     msg: resizing ext4
+  #   become: true
+  #   when: systempart.partitions[0].size < 1500 and systempart.partitions[0].fstype == "ext4"
+  #   tags:
+  #     - partition
+  #
+  # - name: part | grow system if xfs
+  #   debug:
+  #     msg: resizing xfs
+  #   become: true
+  #   when: systempart.partitions[0].size < 1500 and systempart.partitions[0].fstype == "xfs"
+  #   tags:
+  #     - partition
+
+
+  # - name: part | grow fsystem if ext4
+  #   debug:
+  #     msg: growing ext4
+  #   become: true
+  #   when: systempart.partitions[0].size < 1500 and systempart.partitions[0].fstype == "ext4"
+  #   tags:
+  #     - partition
+  #
+  # - name: part | grow fsystem if xfs
+  #   debug:
+  #     msg: growing xfs
+  #   become: true
+  #   when: systempart.partitions[0].size < 1500 and systempart.partitions[0].fstype == "xfs"
+  #   tags:
+  #     - partition
+
+
+
+  # - name: part | grow system partition
+  #   filesystem:
+  #     dev: "{{ partition.device }}1"
+  #     fstype: "{{ partition.parts.system.fs }}"
+  #     resizefs: yes
+  #     force: true
+  #   become: true
+  #   tags:
+  #     - partition
+
+
+
+
+
+  - name: part | create gluster partition if absent
+    parted:
+      device: "{{ partition.device }}"
+      number: 2
+      state: present
+      part_start: "{{ partition.parts.gluster.start.val }}{{ partition.parts.gluster.start.unit }}"
+      part_end: "{{ partition.parts.gluster.end.val }}{{ partition.parts.gluster.end.unit }}"
+    become: true
+    tags:
+      - partition
+
+  - name: part | make xfs filesystem
+    filesystem:
+      dev: "{{ partition.device }}2"
+      fstype: "{{ partition.parts.gluster.fs }}"
+    become: true
+    tags:
+      - partition
+
+  - name: part | create mountpoint
+    file:
+      path: "{{ glustervolume.brick }}"
+      state: directory
+    become: true
+    tags:
+      - partition
+
+  - name: part | mount the brick partition
+    mount:
+      fstype: "{{ partition.parts.gluster.fs }}"
+      path: "{{ glustervolume.brick }}"
+      src: "{{ partition.device }}2"
+      opts: "noatime,nobarrier"
+      state: mounted
+    become: true
+    tags:
+      - partition
+
+
+
+
+
+
+
+  - name: part | check gluster partition state
+    parted:
+      device: "{{ partition.device }}"
+      number: 2
+      state: info
+      unit: "{{ partition.parts.gluster.end.unit }}"
+    become: true
+    register: glusterpart
+    # changed_when: glusterpart.partitions[1].end < 100
+    tags:
+      - partition
+      - parttest
+
+  - name: part | resize gluster part
+    command: |
+      parted ---pretend-input-tty {{ partition.device }} resizepart {{ glusterpart.partitions[1].num }} Yes {{ partition.parts.gluster.end.val }}{{ partition.parts.gluster.end.unit }}
+    when: glusterpart.partitions[1].end < partition.parts.gluster.end.val
+    become: true
+    tags:
+      - partition
+
+
+  - name: part | grow gluster brick with xfs
+    filesystem:
+      dev: "{{ partition.device }}{{ glusterpart.partitions[1].num }}"
+      fstype: "{{ glusterpart.partitions[1].fstype }}"
+      resizefs: yes
+    when: glusterpart.partitions[1].end < partition.parts.gluster.end.val
+    become: true
+    tags:
+      - partition
