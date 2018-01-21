@@ -114,6 +114,58 @@
       - partition::gluster
       - partition::gluster::init
 
+
+  # 
+  # - name: part | create lvg
+  #   lvg:
+  #     vg: vg.gluster
+  #     pvs: "{{ partition.device }}2"
+  #   become: true
+  #   tags:
+  #     - partition
+  #     - partition::gluster
+  #     - partition::gluster::lv
+  #
+  # - name: part | create lv
+  #   lvol:
+  #     vg: vg.gluster
+  #     lv: glusterbrick
+  #     size: 100%VG
+  #   become: true
+  #   tags:
+  #     - partition
+  #     - partition::gluster
+  #     - partition::gluster::lv
+  #
+  # - name: part | make xfs filesystem
+  #   filesystem:
+  #     dev: "/dev/mapper/vg.gluster-glusterbrick"
+  #     fstype: "{{ partition.parts.gluster.fs }}"
+  #     opts: -i size=512
+  #     #resizefs: yes
+  #   become: true
+  #   tags:
+  #     - partition
+  #     - partition::gluster
+  #     - partition::gluster::lv
+  #
+  #
+  # - name: part | mount the brick partition
+  #   mount:
+  #     fstype: "{{ partition.parts.gluster.fs }}"
+  #     path: "{{ glustervolume.brick }}"
+  #     src: "/dev/mapper/vg.gluster-glusterbrick"
+  #     opts: "rw,inode64,noatime,nouuid"
+  #     state: mounted
+  #   become: true
+  #   tags:
+  #     - partition
+  #     - partition::gluster
+  #     - partition::gluster::lv
+  #     - partition::gluster::lv::mount
+
+
+
   - name: part | mount the brick partition
     mount:
       fstype: "{{ partition.parts.gluster.fs }}"

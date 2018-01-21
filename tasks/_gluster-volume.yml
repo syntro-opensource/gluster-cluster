@@ -1,0 +1,34 @@
+---
+  - name: gluster-volume | create volume-dir
+    file:
+      path: "{{ glustervolume.brick }}/{{ item.name }}"
+      state: directory
+    become: true
+    with_items:
+      - "{{ glustervols }}"
+    tags:
+      - volume
+      - volume::dir
+
+  - name: gluster-volume | create volume in pool
+    gluster_volume:
+      name: "{{ item.name }}"
+      bricks: "{{ glustervolume.brick }}/{{ item.name }}"
+      cluster: "{{ play_hosts }}"
+      quota: "{{ item.quota }}"
+      # disperses: 2
+      redundancies: 1
+      state: present
+    become: true
+    delegate_to: "{{ play_hosts[0] }}"
+    with_items:
+      - "{{ glustervols }}"
+    tags:
+      - volume
+      - volume::dir
+
+  - name: debug | description
+    debug:
+      var: play_hosts
+    tags:
+      - debug

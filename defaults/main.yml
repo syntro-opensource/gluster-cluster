@@ -4,21 +4,29 @@
 servers:
   - { ip: 192.168.200.21, hostname: gluster1.storage.local }
   - { ip: 192.168.200.22, hostname: gluster2.storage.local }
+  - { ip: 192.168.200.23, hostname: gluster3.storage.local }
+
+
+glustervols:
+  - name: test1
+    quota: 2.0GB
+
+
 
 partition:
-  device: /dev/vda
+  device: /dev/sdb
   parts:
     system:
       start:
         val: "1"
         unit: ""
       end:
-        val: 2.0
+        val: 1.0
         unit: GiB
       fs: ext4
     gluster:
       start:
-        val: 2.01
+        val: 1.01
         unit: GiB
       end:
         val: 100
@@ -31,4 +39,4 @@ brick_dir: "/data/{{ vol_name }}"
 
 glustervolume:
   name: demo-ha
-  brick: "{{ brick_dir }}/ssdbrick/"
+  brick: "{{ brick_dir }}/ssdbrick"
